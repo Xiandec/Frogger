@@ -1,5 +1,5 @@
 import pygame
-
+from random import choice
 
 class Enemy():
     """
@@ -7,13 +7,14 @@ class Enemy():
     """
 
     def __init__(self,
-                 x: int,
+                 x_move: int,
                  row: int,
                  screen: pygame.display,
                  size_type: str,
                  size: list,
                  speed: int,
-                 rows_on_screen: int
+                 rows_on_screen: int,
+                 direction: int = 1
                  ) -> None:
         self.size = size
         self.rows_on_screen = rows_on_screen
@@ -26,10 +27,18 @@ class Enemy():
                 self.size_car = (100, size[1] // self.rows_on_screen)
             case 'large':
                 self.size_car = (200, size[1] // self.rows_on_screen)
-        self.x = x
+        self.x = self.size[0] + x_move if direction == 1 else x_move - self.size_car[0]
         self.y = size[1] - self.row * size[1] // self.rows_on_screen
         self.screen = screen
         self.speed = speed
+        self.direction = direction
+
+    def regenerate(self) -> None:
+        """
+        Regenerate the enemy in a start position
+        """
+        self.x = self.size[0] if self.direction == 1 else 0 - self.size_car[0]
+        return
 
     def draw(self, offset: int = 0) -> None:
         """
@@ -44,7 +53,7 @@ class Enemy():
         """
         Move the enemy to the left
         """
-        self.x -= self.speed
+        self.x -= self.speed * self.direction
         return
 
     def change_row(self, row: int) -> None:
@@ -63,13 +72,20 @@ class Enemy():
             return True
         return False
 
-    def is_destroy(self) -> bool:
+    def is_destroy_to_regenerate(self) -> None:
         """
-        Check if the enemy is out of bounds
+        Check if the enemy is out of bounds and regenerate if necessary
         """
-        if self.x + self.size_car[0] < 0 or self.row <= 0:
-            return True
-        return False
+        match self.direction:
+            case 1:
+                if self.x + self.size_car[0] < 0:
+                    self.regenerate()
+                    return 
+            case -1:
+                if self.x > self.size[0] :
+                    self.regenerate()
+                    return
+        return 
 
 
 class EnemyController():
@@ -90,13 +106,14 @@ class EnemyController():
                   row: int,
                   x_move: int = 0,
                   size: str = 'medium',
-                  speed: int = 5
+                  speed: int = 5,
+                  direction: int = 1
                   ) -> None:
         """
         Create a new enemy
         """
         self.enemies.append({'row': row, 'e': Enemy(
-            self.size[1] + x_move, row, self.screen, size, self.size, speed, self.rows_on_screen)})
+            x_move, row, self.screen, size, self.size, speed, self.rows_on_screen, direction)})
         return
 
     def generate_by_pattern(self,
@@ -106,20 +123,21 @@ class EnemyController():
         """
         Generate enemies by pattern
         """
+        direction = choice([-1, 1])
         match pattern:
             case 1:
-                self.add_enemy(row)
-                self.add_enemy(row, 300)
-                self.add_enemy(row, 600)
+                self.add_enemy(row, direction=direction)
+                self.add_enemy(row, 300, direction=direction)
+                self.add_enemy(row, 600, direction=direction)
             case 2:
-                self.add_enemy(row, 0, 'large', 2)
-                self.add_enemy(row, 500, 'large', 2)
-                self.add_enemy(row, 1000, 'large', 2)
+                self.add_enemy(row, 0, 'large', 2, direction=direction)
+                self.add_enemy(row, 500, 'large', 2, direction=direction)
+                self.add_enemy(row, 1000, 'large', 2, direction=direction)
             case 3:
-                self.add_enemy(row, 0, 'small', 10)
-                self.add_enemy(row, 350, 'small', 10)
-                self.add_enemy(row, 700, 'small', 10)
-                self.add_enemy(row, 1050, 'small', 10)
+                self.add_enemy(row, 0, 'small', 10, direction=direction)
+                self.add_enemy(row, 350, 'small', 10, direction=direction)
+                self.add_enemy(row, 700, 'small', 10, direction=direction)
+                self.add_enemy(row, 1050, 'small', 10, direction=direction)
             case 0:
                 pass
         return
@@ -128,14 +146,10 @@ class EnemyController():
         """
         Update enemies positions and draw them
         """
-        for enemy in self.enemies.copy():
+        for enemy in self.enemies:
             enemy['e'].draw()
             enemy['e'].move()
-            if enemy['e'].is_destroy():
-                if enemy['e'].row >= 0:  # if its reached left bound generate new
-                    self.enemies.append({'row': enemy['e'].row, 'e': Enemy(
-                        self.size[0], enemy['e'].row, self.screen, enemy['e'].size_type, self.size, enemy['e'].speed, self.rows_on_screen)})
-                self.enemies.remove(enemy)
+            enemy['e'].is_destroy_to_regenerate()
         return
     
     def draw_down(self, offset:int = 0) -> None:
@@ -150,9 +164,12 @@ class EnemyController():
         """
         Move enemies to the specified row and adjust their row values accordingly
         """
-        for enemy in self.enemies:
-            enemy['e'].change_row(row)
-            enemy['row'] -= row
+        for enemy in self.enemies.copy():
+            if enemy['row'] - row > 0:
+                enemy['e'].change_row(row)
+                enemy['row'] -= row
+            else:
+                self.enemies.remove(enemy)
         return
 
     def check_collisions(self, row, player_x, player_width) -> None:
