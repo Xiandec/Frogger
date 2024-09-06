@@ -2,7 +2,15 @@ import pygame
 
 
 class Enemy():
-    def __init__(self, x, row, screen, size_type, size, speed, rows_on_screen):
+    def __init__(self,
+                 x: int,
+                 row: int,
+                 screen: pygame.display,
+                 size_type: str,
+                 size: list,
+                 speed: int,
+                 rows_on_screen: int
+                 ) -> None:
         self.size = size
         self.rows_on_screen = rows_on_screen
         self.row = row
@@ -29,12 +37,12 @@ class Enemy():
         self.x -= self.speed
         return
 
-    def change_row(self, row) -> None:
+    def change_row(self, row: int) -> None:
         self.row -= row
         self.y = self.size[1] - self.row * self.size[1] // self.rows_on_screen
         return
 
-    def is_collision(self, player_x, player_width) -> bool:
+    def is_collision(self, player_x: int, player_width: int) -> bool:
         if (player_x + player_width >= self.x) and (player_x <= self.x + self.size_car[0]):
             return True
         return False
@@ -46,17 +54,29 @@ class Enemy():
 
 
 class EnemyController():
-    def __init__(self, size, screen, rows_on_screen) -> None:
+    def __init__(self,
+                 size: list,
+                 screen,
+                 rows_on_screen: int) -> None:
         self.enemies = []
         self.size = size
         self.screen = screen
         self.rows_on_screen = rows_on_screen
 
-    def add_enemy(self, row, x_move=0, size='medium', speed=5) -> None:
+    def add_enemy(self,
+                  row: int,
+                  x_move: int = 0,
+                  size: str = 'medium',
+                  speed: int = 5
+                  ) -> None:
         self.enemies.append({'row': row, 'e': Enemy(
             self.size[1] + x_move, row, self.screen, size, self.size, speed, self.rows_on_screen)})
+        return
 
-    def generate_by_pattern(self, row, pattern) -> None:
+    def generate_by_pattern(self,
+                            row: int,
+                            pattern: int
+                            ) -> None:
         match pattern:
             case 1:
                 self.add_enemy(row)
@@ -83,11 +103,13 @@ class EnemyController():
                     self.enemies.append({'row': enemy['e'].row, 'e': Enemy(
                         self.size[0], enemy['e'].row, self.screen, enemy['e'].size_type, self.size, enemy['e'].speed, self.rows_on_screen)})
                 self.enemies.remove(enemy)
+        return
 
     def move_enemies(self, row) -> None:
         for enemy in self.enemies:
             enemy['e'].change_row(row)
             enemy['row'] -= row
+        return
 
     def check_collisions(self, row, player_x, player_width) -> None:
         for enemy in self.enemies:

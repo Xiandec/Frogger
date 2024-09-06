@@ -1,7 +1,14 @@
 import pygame
 
+
 class Player():
-    def __init__(self, x, width, screen, size, rows_on_screen):
+    def __init__(self,
+                 x: int,
+                 width: int,
+                 screen: pygame.display,
+                 size: list,
+                 rows_on_screen: int
+                 ) -> None:
         self.size = size
         self.rows_on_screen = rows_on_screen
         self.x = x
@@ -12,17 +19,19 @@ class Player():
         self.screen = screen
 
         self.move_ticker = 0
-        
-    def get_current_row(self):
+
+    def get_current_row(self) -> int:
         return self.current_row
-    
-    def set_current_row(self, row):
+
+    def set_current_row(self, row: int) -> None:
         self.current_row = row
+        return
 
-    def draw(self):
-        pygame.draw.rect(self.screen, (0, 240, 0), [self.x, self.size[1] - self.current_row * self.height, self.width, self.height])
+    def draw(self) -> None:
+        pygame.draw.rect(self.screen, (0, 240, 0), [
+                         self.x, self.size[1] - self.current_row * self.height, self.width, self.height])
 
-    def move(self):
+    def move(self) -> None:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
             if self.move_ticker == 0:
@@ -33,3 +42,4 @@ class Player():
                 self.current_row -= 1 if self.current_row > 1 else 0
                 self.move_ticker = 5 if self.current_row > 1 else 0
         self.move_ticker -= 1 if self.move_ticker > 0 else 0
+        return

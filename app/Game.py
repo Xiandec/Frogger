@@ -16,7 +16,7 @@ class Game():
         self.unsave_coluns = 3
         self.rows_on_screen = 10
 
-    def start(self):
+    def start(self) -> None:
         self.score = 0
         self.player = Player(self.size[0] // 2 - self.size[1] // 20,
                              self.size[1] // 10, self.screen, self.size, self.rows_on_screen)
@@ -26,7 +26,7 @@ class Game():
         self.generator()
         return
 
-    def generator(self):
+    def generator(self) -> None:
         for row in self.map.rows_to_generate:
             self.enemy_controller.generate_by_pattern(row['row'] - self.score + 1, row['pattern'])
             self.map.rows_to_generate.remove(row)
@@ -52,7 +52,7 @@ class Game():
         pygame.display.flip()
         self.clock.tick(30)
 
-    def check_score(self):
+    def check_score(self) -> None:
         pos = self.map.get_save_row(self.player.get_current_row() - 1 + self.score)
         if pos != None:
             self.enemy_controller.move_enemies(self.player.get_current_row() - 1)
@@ -60,7 +60,7 @@ class Game():
             self.score = pos
             self.map.remove_save_row(self.score)
 
-    def check_loose(self):
+    def check_loose(self) -> None:
         if self.enemy_controller.check_collisions(self.player.get_current_row(), self.player.x, self.player.width):
             self.start()
 
