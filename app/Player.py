@@ -2,6 +2,10 @@ import pygame
 
 
 class Player():
+    """
+    Class for player
+    """
+
     def __init__(self,
                  x: int,
                  width: int,
@@ -21,17 +25,29 @@ class Player():
         self.move_ticker = 0
 
     def get_current_row(self) -> int:
+        """
+        Returns the current row
+        """
         return self.current_row
 
     def set_current_row(self, row: int) -> None:
+        """
+        Sets the current row to the given row
+        """
         self.current_row = row
         return
 
     def draw(self) -> None:
+        """
+        Draw player on screen
+        """
         pygame.draw.rect(self.screen, (0, 240, 0), [
                          self.x, self.size[1] - self.current_row * self.height, self.width, self.height])
 
     def move(self) -> None:
+        """
+        Move player up and down
+        """
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
             if self.move_ticker == 0:

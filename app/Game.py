@@ -3,7 +3,12 @@ from app.Player import Player
 from app.Map import Map
 from app.Enemy import EnemyController
 
+
 class Game():
+    """
+    Game controller class 
+    """
+
     def __init__(self) -> None:
         pygame.init()
         self.my_font = pygame.font.SysFont('arial', 20)
@@ -17,23 +22,35 @@ class Game():
         self.rows_on_screen = 10
 
     def start(self) -> None:
+        """
+        Start new game
+        """
         self.score = 0
         self.player = Player(self.size[0] // 2 - self.size[1] // 20,
                              self.size[1] // 10, self.screen, self.size, self.rows_on_screen)
-        
-        self.map = Map(self.size, self.rows_on_screen, self.save_coluns, self.unsave_coluns)
-        self.enemy_controller = EnemyController(self.size, self.screen, self.rows_on_screen)
+
+        self.map = Map(self.size, self.rows_on_screen,
+                       self.save_coluns, self.unsave_coluns)
+        self.enemy_controller = EnemyController(
+            self.size, self.screen, self.rows_on_screen)
         self.generator()
         return
 
     def generator(self) -> None:
+        """
+        Generate new enemys
+        """
         for row in self.map.rows_to_generate:
-            self.enemy_controller.generate_by_pattern(row['row'] - self.score + 1, row['pattern'])
+            self.enemy_controller.generate_by_pattern(
+                row['row'] - self.score + 1, row['pattern'])
             self.map.rows_to_generate.remove(row)
+        return
 
     def update(self) -> None:
+        """
+        Draw game on screen
+        """
         self.screen.fill((240, 240, 240))
-
 
         # Background
         for i in self.map.get_map(self.score):
@@ -44,28 +61,47 @@ class Game():
                 pygame.draw.rect(self.screen, (100, 100, 100), [0, self.size[1] - self.size[1] // self.rows_on_screen -
                                  (i['row'] - self.score) * self.size[1] // self.rows_on_screen, self.size[0], self.size[1] // self.rows_on_screen])
 
+        # player
         self.player.draw()
+
+        # enemies
         self.enemy_controller.update()
 
+        # Score
         text = self.my_font.render(f'Score: {self.score}', True, (0, 0, 0))
         self.screen.blit(text, (10, 10))
+
+        # Update screen
         pygame.display.flip()
         self.clock.tick(30)
+        return
 
     def check_score(self) -> None:
-        pos = self.map.get_save_row(self.player.get_current_row() - 1 + self.score)
+        """
+        Check if reached new line and move everything down
+        """
+        pos = self.map.get_save_row(
+            self.player.get_current_row() - 1 + self.score)
         if pos != None:
-            self.enemy_controller.move_enemies(self.player.get_current_row() - 1)
+            self.enemy_controller.move_enemies(
+                self.player.get_current_row() - 1)
             self.player.set_current_row(1)
             self.score = pos
             self.map.remove_save_row(self.score)
+        return
 
     def check_loose(self) -> None:
+        """ 
+        Check if the player loose and restart if it is
+        """
         if self.enemy_controller.check_collisions(self.player.get_current_row(), self.player.x, self.player.width):
             self.start()
-
+        return
 
     def run(self) -> None:
+        """
+        Run game loop
+        """
         self.start()
         self.update()
         running = True

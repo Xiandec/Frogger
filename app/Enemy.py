@@ -2,6 +2,10 @@ import pygame
 
 
 class Enemy():
+    """
+    Class for enemys
+    """
+
     def __init__(self,
                  x: int,
                  row: int,
@@ -28,32 +32,51 @@ class Enemy():
         self.speed = speed
 
     def draw(self) -> None:
+        """
+        Move and draw the enemy
+        """
         self.move()
         pygame.draw.rect(self.screen, (255, 0, 0), [
                          self.x, self.y, self.size_car[0], self.size_car[1]])
         return
 
     def move(self) -> None:
+        """
+        Move the enemy to the left
+        """
         self.x -= self.speed
         return
 
     def change_row(self, row: int) -> None:
+        """
+        Change the enemy row
+        """
         self.row -= row
         self.y = self.size[1] - self.row * self.size[1] // self.rows_on_screen
         return
 
     def is_collision(self, player_x: int, player_width: int) -> bool:
+        """
+        Check if the enemy collide with the player
+        """
         if (player_x + player_width >= self.x) and (player_x <= self.x + self.size_car[0]):
             return True
         return False
 
     def is_destroy(self) -> bool:
+        """
+        Check if the enemy is out of bounds
+        """
         if self.x + self.size_car[0] < 0 or self.row <= 0:
             return True
         return False
 
 
 class EnemyController():
+    """
+    Class for managing enemy movements and collisions
+    """
+
     def __init__(self,
                  size: list,
                  screen,
@@ -69,6 +92,9 @@ class EnemyController():
                   size: str = 'medium',
                   speed: int = 5
                   ) -> None:
+        """
+        Create a new enemy
+        """
         self.enemies.append({'row': row, 'e': Enemy(
             self.size[1] + x_move, row, self.screen, size, self.size, speed, self.rows_on_screen)})
         return
@@ -77,6 +103,9 @@ class EnemyController():
                             row: int,
                             pattern: int
                             ) -> None:
+        """
+        Generate enemies by pattern
+        """
         match pattern:
             case 1:
                 self.add_enemy(row)
@@ -96,22 +125,31 @@ class EnemyController():
         return
 
     def update(self) -> None:
+        """
+        Update enemies positions and draw them
+        """
         for enemy in self.enemies:
             enemy['e'].draw()
             if enemy['e'].is_destroy():
-                if enemy['e'].row >= 0:
+                if enemy['e'].row >= 0:  # if its reached left bound generate new
                     self.enemies.append({'row': enemy['e'].row, 'e': Enemy(
                         self.size[0], enemy['e'].row, self.screen, enemy['e'].size_type, self.size, enemy['e'].speed, self.rows_on_screen)})
                 self.enemies.remove(enemy)
         return
 
     def move_enemies(self, row) -> None:
+        """
+        Move enemies to the specified row and adjust their row values accordingly
+        """
         for enemy in self.enemies:
             enemy['e'].change_row(row)
             enemy['row'] -= row
         return
 
     def check_collisions(self, row, player_x, player_width) -> None:
+        """
+        Check for collisions with the player at the specified row
+        """
         for enemy in self.enemies:
             if enemy['row'] == row and enemy['e'].is_collision(player_x, player_width):
                 return True
