@@ -176,7 +176,7 @@ class Game():
         Check if the player loose and restart if it is
         """
         if self.enemy_controller.check_collisions(self.player.get_current_row(), self.player.x, self.player.width):
-            self.animation_game_over(len(self.map.rows))
+            self.animation_game_over(len(self.map.rows) - self.score)
             self.waiter()
             self.start()
         return
