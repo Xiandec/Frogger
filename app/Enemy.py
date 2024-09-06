@@ -35,8 +35,9 @@ class Enemy():
         """
         Draw the enemy
         """
-        pygame.draw.rect(self.screen, (255, 0, 0), [
-                         self.x, self.y + offset, self.size_car[0], self.size_car[1]])
+        pygame.draw.rect(self.screen, (255, 70, 0), [
+                         self.x, self.y + offset + self.size_car[1] * 0.05, self.size_car[0], self.size_car[1] * 0.9],
+                         border_radius=5)
         return
 
     def move(self) -> None:
