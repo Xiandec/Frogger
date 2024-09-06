@@ -133,7 +133,7 @@ class Game():
     
     def animation_game_over(self, down_rows: int) -> None:
         """
-        Move down whole screen
+        Move down whole screen and show `Game over`
         """
         for offset in range(0, self.size[1] // self.rows_on_screen * (down_rows + 1), self.size[1] // self.rows_on_screen * down_rows // 25):
             self.screen.fill(self.save_color)
@@ -144,6 +144,9 @@ class Game():
             # Score
             text = self.my_font.render(f'Score: {self.score}', True, (0, 0, 0))
             self.screen.blit(text, (self.size[0] * 0.01, self.size[1] * 0.01 + self.size[1] * 0.2))
+
+            text = self.my_font.render(f'Press any key to restart', True, (0, 0, 0))
+            self.screen.blit(text, (self.size[0] * 0.01, self.size[1] * 0.01 + self.size[1] * 0.2 + self.size[1] * 0.04))
 
             # Background
             for i in self.map.get_map(self.score):
@@ -188,7 +191,7 @@ class Game():
                 if event.type == pygame.QUIT:
                     running = False
                     pygame.quit()
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYUP:
                     running = False
         return
 

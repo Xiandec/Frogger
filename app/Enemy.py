@@ -128,7 +128,7 @@ class EnemyController():
         """
         Update enemies positions and draw them
         """
-        for enemy in self.enemies:
+        for enemy in self.enemies.copy():
             enemy['e'].draw()
             enemy['e'].move()
             if enemy['e'].is_destroy():
