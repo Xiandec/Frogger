@@ -25,6 +25,7 @@ class Game():
         self.save_coluns = 1
         self.unsave_coluns = 3
         self.rows_on_screen = 10
+        self.rows_on_screen = min(max(self.rows_on_screen, self.save_coluns + self.unsave_coluns), self.size[0] // 10)
 
         self.road_color = (170, 155, 155)
         self.save_color = (214, 204, 203)
