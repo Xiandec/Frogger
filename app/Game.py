@@ -23,13 +23,18 @@ class Game():
         
         self.map = Map(self.size, self.rows_on_screen, self.save_coluns, self.unsave_coluns)
         self.enemy_controller = EnemyController(self.size, self.screen, self.rows_on_screen)
-        self.enemy_controller.add_enemy(2)
-        self.enemy_controller.add_enemy(5)
-        self.enemy_controller.add_enemy(8)
+        self.generator()
         return
+
+    def generator(self):
+        for row in self.map.rows_to_generate:
+            self.enemy_controller.generate_by_pattern(row['row'] - self.score + 1, row['pattern'])
+            self.map.rows_to_generate.remove(row)
+            print(self.map.rows_to_generate)
 
     def update(self) -> None:
         self.screen.fill((240, 240, 240))
+
 
         # Background
         for i in self.map.get_map(self.score):
@@ -51,7 +56,7 @@ class Game():
     def check_score(self):
         pos = self.map.get_save_row(self.player.get_current_row() - 1 + self.score)
         if pos != None:
-            self.enemy_controller.move_enemies(self.player.get_current_row() - 1 + self.score)
+            self.enemy_controller.move_enemies(self.player.get_current_row() - 1)
             self.player.set_current_row(1)
             self.score = pos
             self.map.remove_save_row(self.score)
@@ -70,6 +75,7 @@ class Game():
                 if event.type == pygame.QUIT:
                     running = False
             self.player.move()
+            self.generator()
             self.check_score()
             self.check_loose()
             self.update()
