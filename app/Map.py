@@ -16,7 +16,7 @@ class Map():
 
     def create_row(self) -> None:
         if self.rows[-1]['type'] == 'save':
-            rows = [{'type': 'unsave', 'row': len(self.rows) + i, 'pattern': '1'} for i in range(randint(1, self.unsave_colums))]
+            rows = [{'type': 'unsave', 'row': len(self.rows) + i, 'pattern': randint(1, 3)} for i in range(randint(1, self.unsave_colums))]
             self.rows.extend(rows)
             self.rows_to_generate.extend(rows)
         else:

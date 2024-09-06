@@ -30,7 +30,6 @@ class Game():
         for row in self.map.rows_to_generate:
             self.enemy_controller.generate_by_pattern(row['row'] - self.score + 1, row['pattern'])
             self.map.rows_to_generate.remove(row)
-            print(self.map.rows_to_generate)
 
     def update(self) -> None:
         self.screen.fill((240, 240, 240))

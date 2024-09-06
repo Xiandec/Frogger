@@ -54,15 +54,26 @@ class EnemyController():
 
     def add_enemy(self, row, x_move=0, size='medium', speed=5) -> None:
         self.enemies.append({'row': row, 'e': Enemy(
-            self.size[1] + x_move, row, self.screen, 'medium', self.size, 5, self.rows_on_screen)})
+            self.size[1] + x_move, row, self.screen, size, self.size, speed, self.rows_on_screen)})
 
     def generate_by_pattern(self, row, pattern) -> None:
         match pattern:
-            case '1':
+            case 1:
                 self.add_enemy(row)
-                self.add_enemy(row, 200)
-            case '0':
+                self.add_enemy(row, 300)
+                self.add_enemy(row, 600)
+            case 2:
+                self.add_enemy(row, 0, 'large', 2)
+                self.add_enemy(row, 500, 'large', 2)
+                self.add_enemy(row, 1000, 'large', 2)
+            case 3:
+                self.add_enemy(row, 0, 'small', 10)
+                self.add_enemy(row, 350, 'small', 10)
+                self.add_enemy(row, 700, 'small', 10)
+                self.add_enemy(row, 1050, 'small', 10)
+            case 0:
                 pass
+        return
 
     def update(self) -> None:
         for enemy in self.enemies:
