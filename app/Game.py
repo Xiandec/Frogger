@@ -83,11 +83,46 @@ class Game():
         pos = self.map.get_save_row(
             self.player.get_current_row() - 1 + self.score)
         if pos != None:
+            self.animation_down(pos - self.score)
             self.enemy_controller.move_enemies(
                 self.player.get_current_row() - 1)
             self.player.set_current_row(1)
             self.score = pos
             self.map.remove_save_row(self.score)
+        return
+    
+    def animation_down(self, down_rows: int) -> None:
+        """
+        Move down whole screen
+        """
+        for offset in range(0, self.size[1] // self.rows_on_screen * down_rows, self.size[1] // self.rows_on_screen * down_rows // 10):
+            self.screen.fill((240, 240, 240))
+
+            # Background
+            for i in self.map.get_map(self.score):
+                if i['type'] == 'save':
+                    pygame.draw.rect(self.screen, (230, 230, 230), [0, self.size[1] - self.size[1] // self.rows_on_screen -
+                                    (i['row'] - self.score) * self.size[1] // self.rows_on_screen + offset, self.size[0], self.size[1] // self.rows_on_screen])
+                else:
+                    pygame.draw.rect(self.screen, (100, 100, 100), [0, self.size[1] - self.size[1] // self.rows_on_screen -
+                                    (i['row'] - self.score) * self.size[1] // self.rows_on_screen + offset, self.size[0], self.size[1] // self.rows_on_screen])
+
+            # player
+            self.player.draw(offset)
+
+            # enemies
+            self.enemy_controller.draw_down(offset)
+
+            # Score
+            text = self.my_font.render(f'Score: {self.score}', True, (0, 0, 0))
+            self.screen.blit(text, (10, 10))
+
+            # Update screen
+            pygame.display.flip()
+            self.clock.tick(30)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
         return
 
     def check_loose(self) -> None:

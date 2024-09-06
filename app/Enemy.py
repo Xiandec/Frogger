@@ -31,13 +31,12 @@ class Enemy():
         self.screen = screen
         self.speed = speed
 
-    def draw(self) -> None:
+    def draw(self, offset: int = 0) -> None:
         """
-        Move and draw the enemy
+        Draw the enemy
         """
-        self.move()
         pygame.draw.rect(self.screen, (255, 0, 0), [
-                         self.x, self.y, self.size_car[0], self.size_car[1]])
+                         self.x, self.y + offset, self.size_car[0], self.size_car[1]])
         return
 
     def move(self) -> None:
@@ -130,11 +129,20 @@ class EnemyController():
         """
         for enemy in self.enemies:
             enemy['e'].draw()
+            enemy['e'].move()
             if enemy['e'].is_destroy():
                 if enemy['e'].row >= 0:  # if its reached left bound generate new
                     self.enemies.append({'row': enemy['e'].row, 'e': Enemy(
                         self.size[0], enemy['e'].row, self.screen, enemy['e'].size_type, self.size, enemy['e'].speed, self.rows_on_screen)})
                 self.enemies.remove(enemy)
+        return
+    
+    def draw_down(self, offset:int = 0) -> None:
+        """
+        Draw enemies with offset
+        """
+        for enemy in self.enemies:
+            enemy['e'].draw(offset)
         return
 
     def move_enemies(self, row) -> None:

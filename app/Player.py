@@ -22,7 +22,7 @@ class Player():
         self.direction = 'right'
         self.screen = screen
 
-        self.move_ticker = 0
+        self.move_ticker = 5
 
     def get_current_row(self) -> int:
         """
@@ -35,14 +35,15 @@ class Player():
         Sets the current row to the given row
         """
         self.current_row = row
+        self.move_ticker = 5
         return
 
-    def draw(self) -> None:
+    def draw(self, offset: int = 0) -> None:
         """
         Draw player on screen
         """
         pygame.draw.rect(self.screen, (0, 240, 0), [
-                         self.x, self.size[1] - self.current_row * self.height, self.width, self.height])
+                         self.x, self.size[1] - self.current_row * self.height + offset, self.width, self.height])
 
     def move(self) -> None:
         """
