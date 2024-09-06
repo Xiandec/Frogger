@@ -1,4 +1,6 @@
 import pygame
+import os
+from random import choice
 from app.Player import Player
 from app.Map import Map
 from app.Enemy import EnemyController
@@ -26,6 +28,13 @@ class Game():
 
         self.road_color = (170, 155, 155)
         self.save_color = (214, 204, 203)
+
+        dirname = os.path.dirname(__file__)
+        self.save_sounds = next(os.walk(os.path.join(dirname, 'sounds/save')), (None, None, []))[2]
+        self.save_sounds = list(map(lambda x: os.path.join(dirname, 'sounds/save', x), self.save_sounds))
+
+        self.exploration_sounds = next(os.walk(os.path.join(dirname, 'sounds/exploration')), (None, None, []))[2]
+        self.exploration_sounds = list(map(lambda x: os.path.join(dirname, 'sounds/exploration', x), self.exploration_sounds))
 
     def start(self) -> None:
         """
@@ -80,21 +89,6 @@ class Game():
         # Update screen
         pygame.display.flip()
         self.clock.tick(30)
-        return
-
-    def check_score(self) -> None:
-        """
-        Check if reached new line and move everything down
-        """
-        pos = self.map.get_save_row(
-            self.player.get_current_row() - 1 + self.score)
-        if pos != None:
-            self.animation_down(pos - self.score)
-            self.enemy_controller.move_enemies(
-                self.player.get_current_row() - 1)
-            self.player.set_current_row(1)
-            self.score = pos
-            self.map.remove_save_row(self.score)
         return
     
     def animation_down(self, down_rows: int) -> None:
@@ -170,12 +164,34 @@ class Game():
                 if event.type == pygame.QUIT:
                     pygame.quit()
         return
+    
+    def check_score(self) -> None:
+        """
+        Check if reached new line and move everything down
+        """
+        pos = self.map.get_save_row(
+            self.player.get_current_row() - 1 + self.score)
+        if pos != None:
+
+            
+            pygame.mixer.Sound.play(pygame.mixer.Sound(choice(self.save_sounds)))
+
+            self.animation_down(pos - self.score)
+            self.enemy_controller.move_enemies(
+                self.player.get_current_row() - 1)
+            self.player.set_current_row(1)
+            self.score = pos
+            self.map.remove_save_row(self.score)
+        return
 
     def check_loose(self) -> None:
         """ 
         Check if the player loose and restart if it is
         """
         if self.enemy_controller.check_collisions(self.player.get_current_row(), self.player.x, self.player.width):
+
+            pygame.mixer.Sound.play(pygame.mixer.Sound(choice(self.exploration_sounds)))
+
             self.animation_game_over(len(self.map.rows) - self.score)
             self.waiter()
             self.start()

@@ -1,5 +1,6 @@
 import pygame
-
+import os
+from random import choice
 
 class Player():
     """
@@ -21,6 +22,10 @@ class Player():
         self.height = size[1] // self.rows_on_screen
         self.direction = 'right'
         self.screen = screen
+
+        dirname = os.path.dirname(__file__)
+        self.jump_sounds = next(os.walk(os.path.join(dirname, 'sounds/jump')), (None, None, []))[2]
+        self.jump_sounds = list(map(lambda x: os.path.join(dirname, 'sounds/jump', x), self.jump_sounds))
 
         self.move_ticker = 5
 
@@ -55,9 +60,12 @@ class Player():
             if self.move_ticker == 0:
                 self.current_row += 1
                 self.move_ticker = 5
+                pygame.mixer.Sound.play(pygame.mixer.Sound(choice(self.jump_sounds)))
+
         if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-            if self.move_ticker == 0:
-                self.current_row -= 1 if self.current_row > 1 else 0
-                self.move_ticker = 5 if self.current_row > 1 else 0
+            if self.move_ticker == 0 and self.current_row > 1:
+                self.current_row -= 1
+                self.move_ticker = 5
+                pygame.mixer.Sound.play(pygame.mixer.Sound(choice(self.jump_sounds)))
         self.move_ticker -= 1 if self.move_ticker > 0 else 0
         return
