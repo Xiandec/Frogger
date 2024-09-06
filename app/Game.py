@@ -99,7 +99,7 @@ class Game():
             self.screen.fill((240, 240, 240))
 
             # Background
-            for i in self.map.get_map(self.score):
+            for i in self.map.get_map(self.score + self.save_coluns + self.unsave_coluns):
                 if i['type'] == 'save':
                     pygame.draw.rect(self.screen, (230, 230, 230), [0, self.size[1] - self.size[1] // self.rows_on_screen -
                                     (i['row'] - self.score) * self.size[1] // self.rows_on_screen + offset, self.size[0], self.size[1] // self.rows_on_screen])
